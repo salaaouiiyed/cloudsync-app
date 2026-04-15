@@ -5,7 +5,7 @@
 FROM node:18-alpine AS build
 WORKDIR /app
 
-ENV NODE_OPTIONS=--openssl-legacy-provider
+# NODE_OPTIONS no longer needed with react-scripts 5+
 ENV CI=false
 ENV GENERATE_SOURCEMAP=false
 # API_URL vide = chemin relatif -> nginx proxy /api/ -> backend (service K8s)
