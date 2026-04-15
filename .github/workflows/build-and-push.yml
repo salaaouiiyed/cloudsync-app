@@ -1,0 +1,85 @@
+name: "CI - Pipeline de Production CloudSync avec Securite"
+
+# Configuration des declencheurs du pipeline
+on:
+  push:
+    branches: [ "main" ] # Declenchement automatique sur la branche principale
+  pull_request:
+    branches: [ "main" ] # Validation automatique lors des demandes de fusion
+
+# Definition des variables d'environnement globales
+env:
+  ACR_NAME: "acrcloudsync2026"                # Nom du registre Azure Container Registry
+  BACKEND_IMAGE: "cloudsync-backend"          # Identifiant de l'image pour le service API
+  FRONTEND_IMAGE: "cloudsync-frontend"        # Identifiant de l'image pour le service Interface
+
+jobs:
+  # PHASE 1 : Construction des artefacts et analyse de vulnerabilites
+  build-and-scan:
+    name: "Construction et Analyse de Securite"
+    runs-on: ubuntu-latest
+    steps:
+      # Recuperation de l'integralite du code source
+      - name: "Recuperation du code source"
+        uses: actions/checkout@v3
+
+      # Authentification Docker Hub
+      - name: "Authentification Docker Hub"
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Construction locale de l'image Backend
+      - name: "Construction de l'image Backend (Environnement Local)"
+        run: docker build ./backend -t ${{ env.BACKEND_IMAGE }}:local
+
+      # Construction locale de l'image Frontend
+      - name: "Construction de l'image Frontend (Environnement Local)"
+        run: docker build ./frontend -t ${{ env.FRONTEND_IMAGE }}:local
+
+      # Analyse de securite statique de l'image Backend via Trivy
+      - name: "Analyse de securite de l'image Backend"
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ env.BACKEND_IMAGE }}:local'
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
+
+      # Analyse de securite statique de l'image Frontend via Trivy
+      - name: "Analyse de securite de l'image Frontend"
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ env.FRONTEND_IMAGE }}:local'
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
+
+  # PHASE 2 : Publication des artefacts vers le registre Azure
+  deploy-to-acr:
+    name: "Publication vers Azure Container Registry"
+    needs: build-and-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Recuperation du code source"
+        uses: actions/checkout@v3
+
+      # Authentification Azure
+      - name: "Authentification Azure"
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Connexion au registre ACR et publication des images
+      - name: "Authentification et Publication vers ACR"
+        run: |
+          az acr login --name ${{ env.ACR_NAME }}
+          
+          # Publication Backend
+          docker build ./backend -t ${{ env.ACR_NAME }}.azurecr.io/${{ env.BACKEND_IMAGE }}:latest -t ${{ env.ACR_NAME }}.azurecr.io/${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+          docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.BACKEND_IMAGE }} --all-tags
+          
+          # Publication Frontend
+          docker build ./frontend -t ${{ env.ACR_NAME }}.azurecr.io/${{ env.FRONTEND_IMAGE }}:latest -t ${{ env.ACR_NAME }}.azurecr.io/${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+          docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.FRONTEND_IMAGE }} --all-tags

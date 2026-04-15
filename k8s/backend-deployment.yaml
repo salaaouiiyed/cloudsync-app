@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: cloudsync
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: <ACR_NAME>.azurecr.io/cloudsync-backend:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: MONGODB_URI
+              value: "mongodb://cloudsync-db-svc:27017/cloudsync"
+            # URL interne K8s (pod-to-pod, pas exposée publiquement)
+            - name: KEYCLOAK_URL
+              value: "http://keycloak-svc:8080"
+            - name: KEYCLOAK_REALM
+              value: "cloudsync-realm"
+            - name: KEYCLOAK_CLIENT_ID
+              value: "cloudsync-app"
+            # URL publique Keycloak (pour la validation iss des tokens JWT)
+            - name: KEYCLOAK_PUBLIC_URL
+              value: "http://<INGRESS_PUBLIC_IP>/auth"
+            # CORS: autoriser l'origine publique du frontend
+            - name: CORS_ORIGIN
+              value: "http://<INGRESS_PUBLIC_IP>"
+            - name: NODE_ENV
+              value: "production"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+  namespace: cloudsync
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 5000
+      targetPort: 5000

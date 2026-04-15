@@ -1,0 +1,8 @@
+{
+  "realm": "cloudsync-realm",
+  "auth-server-url": "http://keycloak:8080",
+  "ssl-required": "external",
+  "resource": "cloudsync-app",
+  "bearer-only": true,
+  "confidential-port": 0
+}
