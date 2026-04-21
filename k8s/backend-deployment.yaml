@@ -14,48 +14,33 @@ spec:
         app: backend
     spec:
       containers:
-        - name: backend
-          image: acrcloudsync2026.azurecr.io/cloudsync-backend:latest
-          ports:
-            - containerPort: 5000
-          env:
-            - name: MONGODB_URI
-              value: "mongodb://cloudsync-db-svc:27017/cloudsync"
-            - name: KEYCLOAK_URL
-              value: "http://keycloak-svc:8080"
-            - name: KEYCLOAK_REALM
-              value: "cloudsync-realm"
-            - name: KEYCLOAK_CLIENT_ID
-              value: "cloudsync-app"
-            - name: KEYCLOAK_PUBLIC_URL
-              value: "http://52.143.159.54/auth"
-            - name: CORS_ORIGIN
-              value: "http://52.143.159.54"
-            - name: NODE_ENV
-              value: "production"
-          # FIX: Readiness + Liveness probes sur /healthz port 5000
-          # Le pod ne reçoit du trafic que s'il répond correctement
-          readinessProbe:
-            httpGet:
-              path: /healthz
-              port: 5000
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            failureThreshold: 3
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 5000
-            initialDelaySeconds: 20
-            periodSeconds: 20
-            failureThreshold: 3
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
-            limits:
-              memory: "256Mi"
-              cpu: "500m"
+      - name: backend
+        image: acrcloudsync2026.azurecr.io/cloudsync-backend:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: MONGODB_URI
+          value: "mongodb://admin:admin123@mongodb-svc:27017/cloudsync?authSource=admin"
+        - name: KEYCLOAK_URL
+          value: "http://keycloak-svc:8080"
+        - name: KEYCLOAK_REALM
+          value: "cloudsync-realm"
+        - name: CORS_ORIGIN
+          value: "*"
+        - name: NODE_ENV
+          value: "production"
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 5000
+          initialDelaySeconds: 20
+          periodSeconds: 20
 ---
 apiVersion: v1
 kind: Service
@@ -66,5 +51,6 @@ spec:
   selector:
     app: backend
   ports:
-    - port: 5000
+    - name: http
+      port: 5000
       targetPort: 5000

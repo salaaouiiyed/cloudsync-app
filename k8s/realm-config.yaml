@@ -1,0 +1,165 @@
+apiVersion: v1
+data:
+  realm.json: |-
+    {
+      "id": "cloudsync-realm",
+      "realm": "cloudsync-realm",
+      "displayName": "CloudSync Pro",
+      "enabled": true,
+      "registrationAllowed": false,
+      "loginWithEmailAllowed": true,
+      "duplicateEmailsAllowed": false,
+      "resetPasswordAllowed": true,
+      "editUsernameAllowed": false,
+      "sslRequired": "none",
+      "bruteForceProtected": true,
+      "failureFactor": 5,
+      "waitIncrementSeconds": 60,
+      "maxFailureWaitSeconds": 900,
+      "accessTokenLifespan": 300,
+      "ssoSessionMaxLifespan": 36000,
+      "roles": {
+        "realm": [
+          {
+            "name": "admin",
+            "description": "Tenant administrator \u2014 can manage projects, members, and workspace settings"
+          },
+          {
+            "name": "user",
+            "description": "Standard user \u2014 read-only access to tenant resources"
+          },
+          {
+            "name": "super_admin",
+            "description": "Platform super admin \u2014 cross-tenant management via Admin Console"
+          }
+        ]
+      },
+      "clients": [
+        {
+          "clientId": "cloudsync-app",
+          "name": "CloudSync App",
+          "enabled": true,
+          "publicClient": true,
+          "directAccessGrantsEnabled": false,
+          "standardFlowEnabled": true,
+          "implicitFlowEnabled": false,
+          "serviceAccountsEnabled": false,
+          "redirectUris": [
+            "http://localhost:3000/*",
+            "http://localhost:3000",
+            "http://52.143.159.54/*",
+            "http://52.143.159.54"
+          ],
+          "webOrigins": [
+            "http://localhost:3000",
+            "http://52.143.159.54",
+            "+"
+          ],
+          "attributes": {
+            "pkce.code.challenge.method": "S256",
+            "post.logout.redirect.uris": "http://localhost:3000/*"
+          },
+          "protocolMappers": [
+            {
+              "name": "tenant_id-mapper",
+              "protocol": "openid-connect",
+              "protocolMapper": "oidc-usermodel-attribute-mapper",
+              "consentRequired": false,
+              "config": {
+                "userinfo.token.claim": "true",
+                "user.attribute": "tenant_id",
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "claim.name": "tenant_id",
+                "jsonType.label": "String",
+                "multivalued": "false",
+                "aggregate.attrs": "false"
+              }
+            }
+          ],
+          "rootUrl": "http://52.143.159.54"
+        }
+      ],
+      "users": [
+        {
+          "username": "super-admin",
+          "enabled": true,
+          "email": "superadmin@cloudsync.pro",
+          "firstName": "Super",
+          "lastName": "Admin",
+          "emailVerified": true,
+          "credentials": [
+            {
+              "type": "password",
+              "value": "Change-Me-In-Prod-1!",
+              "temporary": true
+            }
+          ],
+          "realmRoles": [
+            "super_admin",
+            "admin"
+          ],
+          "attributes": {
+            "tenant_id": [
+              "platform"
+            ]
+          }
+        },
+        {
+          "username": "admin-user",
+          "enabled": true,
+          "email": "admin@cloudsync.pro",
+          "firstName": "Admin",
+          "lastName": "User",
+          "emailVerified": true,
+          "credentials": [
+            {
+              "type": "password",
+              "value": "Change-Me-In-Prod-2!",
+              "temporary": true
+            }
+          ],
+          "realmRoles": [
+            "admin"
+          ],
+          "attributes": {
+            "tenant_id": [
+              "tenant-alpha"
+            ]
+          }
+        },
+        {
+          "username": "standard-user",
+          "enabled": true,
+          "email": "user@cloudsync.pro",
+          "firstName": "Standard",
+          "lastName": "User",
+          "emailVerified": true,
+          "credentials": [
+            {
+              "type": "password",
+              "value": "Change-Me-In-Prod-3!",
+              "temporary": true
+            }
+          ],
+          "realmRoles": [
+            "user"
+          ],
+          "attributes": {
+            "tenant_id": [
+              "tenant-alpha"
+            ]
+          }
+        }
+      ]
+    }
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"realm.json":"{\n  \"id\": \"cloudsync-realm\",\n  \"realm\": \"cloudsync-realm\",\n  \"displayName\": \"CloudSync Pro\",\n  \"enabled\": true,\n  \"registrationAllowed\": false,\n  \"loginWithEmailAllowed\": true,\n  \"duplicateEmailsAllowed\": false,\n  \"resetPasswordAllowed\": true,\n  \"editUsernameAllowed\": false,\n  \"sslRequired\": \"external\",\n  \"bruteForceProtected\": true,\n  \"failureFactor\": 5,\n  \"waitIncrementSeconds\": 60,\n  \"maxFailureWaitSeconds\": 900,\n  \"accessTokenLifespan\": 300,\n  \"ssoSessionMaxLifespan\": 36000,\n  \"roles\": {\n    \"realm\": [\n      {\n        \"name\": \"admin\",\n        \"description\": \"Tenant administrator \\u2014 can manage projects, members, and workspace settings\"\n      },\n      {\n        \"name\": \"user\",\n        \"description\": \"Standard user \\u2014 read-only access to tenant resources\"\n      },\n      {\n        \"name\": \"super_admin\",\n        \"description\": \"Platform super admin \\u2014 cross-tenant management via Admin Console\"\n      }\n    ]\n  },\n  \"clients\": [\n    {\n      \"clientId\": \"cloudsync-app\",\n      \"name\": \"CloudSync App\",\n      \"enabled\": true,\n      \"publicClient\": true,\n      \"directAccessGrantsEnabled\": false,\n      \"standardFlowEnabled\": true,\n      \"implicitFlowEnabled\": false,\n      \"serviceAccountsEnabled\": false,\n      \"redirectUris\": [\n        \"http://localhost:3000/*\",\n        \"http://localhost:3000\",\n        \"http://52.143.159.54/*\",\n        \"http://52.143.159.54\"\n      ],\n      \"webOrigins\": [\n        \"http://localhost:3000\",\n        \"http://52.143.159.54\",\n        \"+\"\n      ],\n      \"attributes\": {\n        \"pkce.code.challenge.method\": \"S256\",\n        \"post.logout.redirect.uris\": \"http://localhost:3000/*\"\n      },\n      \"protocolMappers\": [\n        {\n          \"name\": \"tenant_id-mapper\",\n          \"protocol\": \"openid-connect\",\n          \"protocolMapper\": \"oidc-usermodel-attribute-mapper\",\n          \"consentRequired\": false,\n          \"config\": {\n            \"userinfo.token.claim\": \"true\",\n            \"user.attribute\": \"tenant_id\",\n            \"id.token.claim\": \"true\",\n            \"access.token.claim\": \"true\",\n            \"claim.name\": \"tenant_id\",\n            \"jsonType.label\": \"String\",\n            \"multivalued\": \"false\",\n            \"aggregate.attrs\": \"false\"\n          }\n        }\n      ],\n      \"rootUrl\": \"http://52.143.159.54\"\n    }\n  ],\n  \"users\": [\n    {\n      \"username\": \"super-admin\",\n      \"enabled\": true,\n      \"email\": \"superadmin@cloudsync.pro\",\n      \"firstName\": \"Super\",\n      \"lastName\": \"Admin\",\n      \"emailVerified\": true,\n      \"credentials\": [\n        {\n          \"type\": \"password\",\n          \"value\": \"Change-Me-In-Prod-1!\",\n          \"temporary\": true\n        }\n      ],\n      \"realmRoles\": [\n        \"super_admin\",\n        \"admin\"\n      ],\n      \"attributes\": {\n        \"tenant_id\": [\n          \"platform\"\n        ]\n      }\n    },\n    {\n      \"username\": \"admin-user\",\n      \"enabled\": true,\n      \"email\": \"admin@cloudsync.pro\",\n      \"firstName\": \"Admin\",\n      \"lastName\": \"User\",\n      \"emailVerified\": true,\n      \"credentials\": [\n        {\n          \"type\": \"password\",\n          \"value\": \"Change-Me-In-Prod-2!\",\n          \"temporary\": true\n        }\n      ],\n      \"realmRoles\": [\n        \"admin\"\n      ],\n      \"attributes\": {\n        \"tenant_id\": [\n          \"tenant-alpha\"\n        ]\n      }\n    },\n    {\n      \"username\": \"standard-user\",\n      \"enabled\": true,\n      \"email\": \"user@cloudsync.pro\",\n      \"firstName\": \"Standard\",\n      \"lastName\": \"User\",\n      \"emailVerified\": true,\n      \"credentials\": [\n        {\n          \"type\": \"password\",\n          \"value\": \"Change-Me-In-Prod-3!\",\n          \"temporary\": true\n        }\n      ],\n      \"realmRoles\": [\n        \"user\"\n      ],\n      \"attributes\": {\n        \"tenant_id\": [\n          \"tenant-alpha\"\n        ]\n      }\n    }\n  ]\n}"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"keycloak-realm-config","namespace":"cloudsync"}}
+  creationTimestamp: "2026-04-21T11:17:46Z"
+  name: keycloak-realm-config
+  namespace: cloudsync
+  resourceVersion: "44930"
+  uid: 4e3bf4b9-5278-4ca8-9d9b-78026b303fa4
