@@ -15,7 +15,8 @@ ENV REACT_APP_API_URL=
 
 COPY package*.json ./
 # On force la suppression de NODE_OPTIONS au moment du RUN pour être certain
-RUN unset NODE_OPTIONS && npm install --legacy-peer-deps
+# On force également l'installation de @babel/core compatible
+RUN unset NODE_OPTIONS && npm install --legacy-peer-deps && npm install @babel/core@^7.16.0 --legacy-peer-deps
 
 COPY . .
 # Build de l'application React en forçant CI=false pour ignorer les warnings
