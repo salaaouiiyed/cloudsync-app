@@ -2,9 +2,10 @@
 # STAGE 1 — BUILD (aucune variable Keycloak baked-in)
 # La config est injectée 100% au runtime par env.sh via le ConfigMap AKS
 # =============================================================================
-FROM node:18-alpine AS build
+FROM node:16-alpine AS build
 WORKDIR /app
 
+# Correction pour OpenSSL et React Scripts 4
 ENV NODE_OPTIONS=--openssl-legacy-provider
 ENV CI=false
 ENV GENERATE_SOURCEMAP=false
@@ -12,10 +13,12 @@ ENV GENERATE_SOURCEMAP=false
 ENV REACT_APP_API_URL=
 
 COPY package*.json ./
-RUN npm install --force --legacy-peer-deps
+# Utilisation de --legacy-peer-deps pour éviter les conflits de dépendances
+RUN npm install --legacy-peer-deps
 
 COPY . .
-RUN CI=false npm run build
+# Build de l'application React
+RUN npm run build
 
 # =============================================================================
 # STAGE 2 — NGINX PRODUCTION
