@@ -5,19 +5,20 @@
 FROM node:16-alpine AS build
 WORKDIR /app
 
-# Suppression de NODE_OPTIONS=--openssl-legacy-provider car non supporté par Node 16
+# On s'assure que NODE_OPTIONS est vide pour éviter l'erreur openssl-legacy-provider sur Node 16
+ENV NODE_OPTIONS=""
 ENV CI=false
 ENV GENERATE_SOURCEMAP=false
 # API_URL vide = chemin relatif -> nginx proxy /api/ -> backend (service K8s)
 ENV REACT_APP_API_URL=
 
 COPY package*.json ./
-# Utilisation de --legacy-peer-deps pour éviter les conflits de dépendances
-RUN npm install --legacy-peer-deps
+# On force la suppression de NODE_OPTIONS au moment du RUN pour être certain
+RUN unset NODE_OPTIONS && npm install --legacy-peer-deps
 
 COPY . .
-# Build de l'application React
-RUN npm run build
+# Build de l'application React en s'assurant également que NODE_OPTIONS est vide
+RUN unset NODE_OPTIONS && npm run build
 
 # =============================================================================
 # STAGE 2 — NGINX PRODUCTION
