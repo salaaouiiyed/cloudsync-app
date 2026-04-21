@@ -16,7 +16,10 @@ spec:
       containers:
         - name: keycloak
           image: quay.io/keycloak/keycloak:21.0.0
-          args: ["start-dev", "--import-realm"]
+          # FIX: --http-relative-path=/auth obligatoire pour que Keycloak
+          # réponde sur /auth/realms/... au lieu de /realms/...
+          # Cela correspond au path défini dans l'Ingress et dans les URLs frontend/backend
+          args: ["start-dev", "--import-realm", "--http-relative-path=/auth"]
           env:
             - name: KEYCLOAK_ADMIN
               value: "admin"
@@ -24,6 +27,30 @@ spec:
               value: "admin"
           ports:
             - containerPort: 8080
+          # FIX: Readiness probe — attend que Keycloak soit vraiment prêt
+          # avant de recevoir du trafic (démarre en ~30-60s)
+          readinessProbe:
+            httpGet:
+              path: /auth/realms/master
+              port: 8080
+            initialDelaySeconds: 45
+            periodSeconds: 10
+            failureThreshold: 6
+          # FIX: Liveness probe — redémarre le pod si Keycloak se bloque
+          livenessProbe:
+            httpGet:
+              path: /auth/realms/master
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 20
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
           volumeMounts:
             - name: realm-config
               mountPath: /opt/keycloak/data/import/realm.json

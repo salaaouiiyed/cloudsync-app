@@ -5,7 +5,7 @@ metadata:
   namespace: cloudsync
 data:
   # Remplacer par l'IP publique ou hostname DNS de votre Ingress AGIC
-  REACT_APP_KEYCLOAK_URL: "http://<INGRESS_PUBLIC_IP>/auth"
+  REACT_APP_KEYCLOAK_URL: "http://52.143.159.54/auth"
   REACT_APP_KEYCLOAK_REALM: "cloudsync-realm"
   REACT_APP_KEYCLOAK_CLIENT_ID: "cloudsync-app"
   REACT_APP_API_URL: ""

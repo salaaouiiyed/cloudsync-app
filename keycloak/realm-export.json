@@ -17,9 +17,18 @@
   "ssoSessionMaxLifespan": 36000,
   "roles": {
     "realm": [
-      { "name": "admin",       "description": "Tenant administrator — can manage projects, members, and workspace settings" },
-      { "name": "user",        "description": "Standard user — read-only access to tenant resources" },
-      { "name": "super_admin", "description": "Platform super admin — cross-tenant management via Admin Console" }
+      {
+        "name": "admin",
+        "description": "Tenant administrator \u2014 can manage projects, members, and workspace settings"
+      },
+      {
+        "name": "user",
+        "description": "Standard user \u2014 read-only access to tenant resources"
+      },
+      {
+        "name": "super_admin",
+        "description": "Platform super admin \u2014 cross-tenant management via Admin Console"
+      }
     ]
   },
   "clients": [
@@ -34,10 +43,13 @@
       "serviceAccountsEnabled": false,
       "redirectUris": [
         "http://localhost:3000/*",
-        "http://localhost:3000"
+        "http://localhost:3000",
+        "http://52.143.159.54/*",
+        "http://52.143.159.54"
       ],
       "webOrigins": [
         "http://localhost:3000",
+        "http://52.143.159.54",
         "+"
       ],
       "attributes": {
@@ -61,7 +73,8 @@
             "aggregate.attrs": "false"
           }
         }
-      ]
+      ],
+      "rootUrl": "http://52.143.159.54"
     }
   ],
   "users": [
@@ -73,11 +86,20 @@
       "lastName": "Admin",
       "emailVerified": true,
       "credentials": [
-        { "type": "password", "value": "Change-Me-In-Prod-1!", "temporary": true }
+        {
+          "type": "password",
+          "value": "Change-Me-In-Prod-1!",
+          "temporary": true
+        }
       ],
-      "realmRoles": ["super_admin", "admin"],
+      "realmRoles": [
+        "super_admin",
+        "admin"
+      ],
       "attributes": {
-        "tenant_id": ["platform"]
+        "tenant_id": [
+          "platform"
+        ]
       }
     },
     {
@@ -88,11 +110,19 @@
       "lastName": "User",
       "emailVerified": true,
       "credentials": [
-        { "type": "password", "value": "Change-Me-In-Prod-2!", "temporary": true }
+        {
+          "type": "password",
+          "value": "Change-Me-In-Prod-2!",
+          "temporary": true
+        }
       ],
-      "realmRoles": ["admin"],
+      "realmRoles": [
+        "admin"
+      ],
       "attributes": {
-        "tenant_id": ["tenant-alpha"]
+        "tenant_id": [
+          "tenant-alpha"
+        ]
       }
     },
     {
@@ -103,11 +133,19 @@
       "lastName": "User",
       "emailVerified": true,
       "credentials": [
-        { "type": "password", "value": "Change-Me-In-Prod-3!", "temporary": true }
+        {
+          "type": "password",
+          "value": "Change-Me-In-Prod-3!",
+          "temporary": true
+        }
       ],
-      "realmRoles": ["user"],
+      "realmRoles": [
+        "user"
+      ],
       "attributes": {
-        "tenant_id": ["tenant-alpha"]
+        "tenant_id": [
+          "tenant-alpha"
+        ]
       }
     }
   ]

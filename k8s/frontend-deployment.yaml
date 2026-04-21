@@ -15,26 +15,31 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: <ACR_NAME>.azurecr.io/cloudsync-frontend:latest
+          image: acrcloudsync2026.azurecr.io/cloudsync-frontend:latest
           ports:
             - containerPort: 80
-          # Les variables du ConfigMap sont injectées dans le container
-          # env.sh les lit au démarrage et génère window._env_ dans env-config.js
           envFrom:
             - configMapRef:
                 name: frontend-env-config
+          # FIX: La probe teste une route statique nginx (/healthz-static)
+          # et NON le proxy vers backend:5000/healthz
+          # → Si backend est down, le frontend reste quand même Ready
+          # Note: nginx.conf doit avoir un bloc "location /healthz-static"
+          # qui répond 200 directement (voir nginx.conf corrigé)
           readinessProbe:
             httpGet:
-              path: /healthz
+              path: /healthz-static
               port: 80
             initialDelaySeconds: 5
             periodSeconds: 10
+            failureThreshold: 3
           livenessProbe:
             httpGet:
-              path: /healthz
+              path: /healthz-static
               port: 80
             initialDelaySeconds: 10
             periodSeconds: 20
+            failureThreshold: 3
           resources:
             requests:
               memory: "64Mi"
