@@ -7,6 +7,7 @@ WORKDIR /app
 
 # On s'assure que NODE_OPTIONS est vide pour éviter l'erreur openssl-legacy-provider sur Node 16
 ENV NODE_OPTIONS=""
+# CI=false est CRUCIAL pour que react-scripts ignore les warnings lors du build
 ENV CI=false
 ENV GENERATE_SOURCEMAP=false
 # API_URL vide = chemin relatif -> nginx proxy /api/ -> backend (service K8s)
@@ -17,8 +18,8 @@ COPY package*.json ./
 RUN unset NODE_OPTIONS && npm install --legacy-peer-deps
 
 COPY . .
-# Build de l'application React en s'assurant également que NODE_OPTIONS est vide
-RUN unset NODE_OPTIONS && npm run build
+# Build de l'application React en forçant CI=false pour ignorer les warnings
+RUN unset NODE_OPTIONS && CI=false npm run build
 
 # =============================================================================
 # STAGE 2 — NGINX PRODUCTION
