@@ -1,4 +1,4 @@
-# CloudSync Pro — Multi-Tenant
+
 
 ## Démarrage rapide
 
