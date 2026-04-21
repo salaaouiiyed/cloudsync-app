@@ -5,8 +5,7 @@
 FROM node:16-alpine AS build
 WORKDIR /app
 
-# Correction pour OpenSSL et React Scripts 4
-ENV NODE_OPTIONS=--openssl-legacy-provider
+# Suppression de NODE_OPTIONS=--openssl-legacy-provider car non supporté par Node 16
 ENV CI=false
 ENV GENERATE_SOURCEMAP=false
 # API_URL vide = chemin relatif -> nginx proxy /api/ -> backend (service K8s)
