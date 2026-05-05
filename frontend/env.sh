@@ -1,9 +1,5 @@
 #!/bin/sh
-# =============================================================================
-# RUNTIME CONFIG INJECTION — AKS / Azure Kubernetes Service
-# Exécuté automatiquement par nginx:alpine au démarrage du container
-# Les valeurs viennent du ConfigMap Kubernetes (envFrom ou env:)
-# =============================================================================
+
 set -e
 
 TARGET=/usr/share/nginx/html/env-config.js
