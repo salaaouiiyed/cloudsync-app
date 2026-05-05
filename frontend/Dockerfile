@@ -4,7 +4,7 @@ WORKDIR /app
 # ENV NODE_OPTIONS=--openssl-legacy-provider
 ENV CI=false
 COPY package*.json ./
-RUN npm install --force --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 COPY . .
 RUN npm run build
 
