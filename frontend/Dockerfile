@@ -1,6 +1,7 @@
-FROM node:18-alpine AS build
+FROM node:20-alpine AS build
 WORKDIR /app
-ENV NODE_OPTIONS=--openssl-legacy-provider
+# Removed legacy provider to support modern Node.js versions
+# ENV NODE_OPTIONS=--openssl-legacy-provider
 ENV CI=false
 COPY package*.json ./
 RUN npm install --force --legacy-peer-deps
